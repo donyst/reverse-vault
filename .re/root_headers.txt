@@ -1,0 +1,22 @@
+HTTP/1.1 200 OK
+Date: Sat, 17 Oct 2026 18:15:14 GMT
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+referrer-policy: same-origin
+Vary: Accept-Encoding
+Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+Pragma: no-cache
+Server: cloudflare
+Nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+x-frame-options: SAMEORIGIN
+x-content-type-options: nosniff
+x-xss-protection: 1; mode=block
+expect-ct: max-age=86400, enforce
+cf-cache-status: DYNAMIC
+Strict-Transport-Security: max-age=0; includeSubDomains; preload
+Speculation-Rules: "/cdn-cgi/speculation"
+Report-To: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=hXpeOyz2jPcbYhivlsd6kjoCIAylkvWyilQhFoUY7%2BykLRZ5twO38PGs3Z4U9sgSIUc%2FLtNmM3HVDh%2Fo%2BF8jLYSkXH3FmSsZCFGsau4%2BHU%2FY9HcqWd2NVYQv2X2R8G3a0SFtEw%3D%3D"}]}
+CF-RAY: a4c1499d1e53fce6-SIN
+alt-svc: h3=":443"; ma=86400
+

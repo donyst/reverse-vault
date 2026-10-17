@@ -1,0 +1,27 @@
+BẢN GỐC      sha256(snapshot)=15c428017bafd034d5b5511db247a293295f3795caf59f25b54cdf04f17b745a
+{
+ "proof_sha256": "ec4abcdc32abf43657f5fe6db0b8dba67361764551e00d00eb214897a7b614f7",
+ "post_body": "link=https%3A%2F%2Fwww.facebook.com%2Fzuck&sid=_JoeoTZwEa-PXhRQGbPC1w",
+ "resultUid": "100012345678901",
+ "resultType": "profile",
+ "resultTime": "xử lý trong <ms>",
+ "resultAreaShown": "block",
+ "btnText": "Lấy ID ngay",
+ "btnDisabled": false,
+ "helper": "<span>💡 Hỗ trợ profile, group, fanpage, post, video, ảnh và share link.</span>",
+ "serverErrorShown": "none"
+}
+ANNOTATED    sha256(snapshot)=15c428017bafd034d5b5511db247a293295f3795caf59f25b54cdf04f17b745a
+{
+ "proof_sha256": "ec4abcdc32abf43657f5fe6db0b8dba67361764551e00d00eb214897a7b614f7",
+ "post_body": "link=https%3A%2F%2Fwww.facebook.com%2Fzuck&sid=_JoeoTZwEa-PXhRQGbPC1w",
+ "resultUid": "100012345678901",
+ "resultType": "profile",
+ "resultTime": "xử lý trong <ms>",
+ "resultAreaShown": "block",
+ "btnText": "Lấy ID ngay",
+ "btnDisabled": false,
+ "helper": "<span>💡 Hỗ trợ profile, group, fanpage, post, video, ảnh và share link.</span>",
+ "serverErrorShown": "none"
+}
+KHỚP HOÀN TOÀN: true

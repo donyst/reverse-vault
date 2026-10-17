@@ -1,0 +1,10 @@
+# Dependencies & Builds
+node_modules/
+*.exe
+*.log
+
+# IDE & Configs
+AGENTS.md
+.gemini/
+.system_generated/
+scratch/
