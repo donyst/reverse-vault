@@ -158,6 +158,7 @@ j2download/
 │   │   ├── worker-BAtsrYyp.js# Web Worker bundle
 │   │   └── ...               # Complete vendor & i18n locales
 │   └── NOTES.md              # Technical notes & deep-dive disassembly
+├── engine.js                 # ⚡ Autonomous Turnstile & PoW Resolver (Zero npm deps)
 ├── client.js                 # Complete Node.js HTTP client
 ├── pow_solver.js             # Standalone JavaScript PoW solver module
 ├── pow_solver.go             # High-performance Go PoW solver module
@@ -169,7 +170,18 @@ j2download/
 
 ## 🚀 Quick Start
 
-### Running with Go
+### ⚡ Autonomous Turnstile & Media Resolver (`engine.js`)
+
+**No manual cookies or tokens needed!** The engine automatically interfaces with Chrome CDP (port 9222 or self-launched), auto-solves Cloudflare Turnstile, executes the PoW mining algorithm, issues the scoped JWT, and resolves the media link:
+
+```bash
+cd j2download
+
+# 1-click execution (Zero external npm packages, Node 22+)
+node engine.js "https://www.facebook.com/groups/1528487012172019/permalink/1685137529840299/"
+```
+
+### Running with Go (Pure HTTP Client)
 
 The Go implementation uses strictly standard libraries (`crypto/sha256`, `net/http`, `encoding/json`):
 
@@ -183,7 +195,7 @@ export J2_COOKIE="session=<YOUR_SESSION>; cf_clearance=<YOUR_CF_CLEARANCE>"
 go run main.go pow_solver.go "https://www.facebook.com/groups/1528487012172019/permalink/1685137529840299/"
 ```
 
-### Running with Node.js
+### Running with Node.js (`client.js`)
 
 Zero external npm packages required:
 
