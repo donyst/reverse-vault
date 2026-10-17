@@ -170,39 +170,40 @@ j2download/
 
 ## 🚀 Quick Start
 
-### ⚡ Autonomous Turnstile & Media Resolver (`engine.js`)
+### 🌐 Mode 1: Pure HTTP Client (Zero Browser / Không Trình Duyệt)
 
-**No manual cookies or tokens needed!** The engine automatically interfaces with Chrome CDP (port 9222 or self-launched), auto-solves Cloudflare Turnstile, executes the PoW mining algorithm, issues the scoped JWT, and resolves the media link:
+**100% headless, lightweight standard library requests** (Go `net/http` & Node.js `https`). No Chromium, no Puppeteer, no CDP!
 
+#### Go CLI:
 ```bash
 cd j2download
 
-# 1-click execution (Zero external npm packages, Node 22+)
-node engine.js "https://www.facebook.com/groups/1528487012172019/permalink/1685137529840299/"
-```
-
-### Running with Go (Pure HTTP Client)
-
-The Go implementation uses strictly standard libraries (`crypto/sha256`, `net/http`, `encoding/json`):
-
-```bash
-cd j2download
-
-# Set your current browser cookie (session & cf_clearance)
-export J2_COOKIE="session=<YOUR_SESSION>; cf_clearance=<YOUR_CF_CLEARANCE>"
-
-# Run link extractor
+# Runs out of the box with built-in active clearance session
 go run main.go pow_solver.go "https://www.facebook.com/groups/1528487012172019/permalink/1685137529840299/"
 ```
 
-### Running with Node.js (`client.js`)
+#### Node.js CLI:
+```bash
+cd j2download
 
-Zero external npm packages required:
+# Pure Node.js https client (zero npm dependencies)
+node client.js "https://www.facebook.com/groups/1528487012172019/permalink/1685137529840299/"
+```
+
+> [!IMPORTANT]
+> **Cloudflare Clearance & User-Agent Pairing Rule**:
+> `cf_clearance` cookies cryptographically bind to the specific TLS/User-Agent of the issuer (`Chrome/155.0.0.0`). When making pure HTTP requests, the `User-Agent` and `sec-ch-ua` headers **MUST exactly match** the version bound to the clearance cookie. When matched, Cloudflare WAF bypasses Turnstile completely and delegates authorization directly to the Proof-of-Work challenge!
+
+---
+
+### ⚡ Mode 2: Autonomous Turnstile & Session Refresher (`engine.js`)
+
+When existing session cookies expire or when running in environments that need to mint new clearance sessions from scratch, `engine.js` automatically drives Chrome via native CDP WebSocket, auto-solves Cloudflare Turnstile in ~1 second, and issues fresh credentials:
 
 ```bash
 cd j2download
 
-node client.js "https://www.facebook.com/groups/1528487012172019/permalink/1685137529840299/"
+node engine.js "https://www.facebook.com/groups/1528487012172019/permalink/1685137529840299/"
 ```
 
 ---

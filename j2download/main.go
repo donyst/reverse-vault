@@ -13,7 +13,7 @@ import (
 
 const (
 	BASE_URL   = "https://j2download.com"
-	DEFAULT_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36"
+	DEFAULT_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"
 )
 
 type IssueResponse struct {
@@ -54,7 +54,7 @@ func (c *J2Client) FetchBootstrap() (*Bootstrap, error) {
 	req.Header.Set("accept-language", "vi,en-US;q=0.9,en;q=0.8")
 	req.Header.Set("user-agent", c.UserAgent)
 	req.Header.Set("cookie", c.Cookie)
-	req.Header.Set("sec-ch-ua", `"Chromium";v="152", "Not?A_Brand";v="24", "Google Chrome";v="152"`)
+	req.Header.Set("sec-ch-ua", `"Chromium";v="155", "Not?A_Brand";v="24", "Google Chrome";v="155"`)
 	req.Header.Set("sec-ch-ua-mobile", "?0")
 	req.Header.Set("sec-ch-ua-platform", `"Windows"`)
 	req.Header.Set("sec-fetch-dest", "document")
@@ -167,7 +167,7 @@ func main() {
 
 	cookie := os.Getenv("J2_COOKIE")
 	if cookie == "" {
-		cookie = "session=68718ecc191b88aee567179b3169cd78; cf_clearance=DnHQws86oqmiMsibFPe_0c1.MUuU0XMf8EeUPNlfdsA-1792263995-1.2.1.1-e81g2cXWI6yjanJD4xwOxxM9w_i279JS83It0Z3W6mk5tdq2iI04RGOc2IUQlZNgkqRNKknj4Ev8rYFoyW21rJ8vy6mi1.v7JZXCDzEKRzthStUf2w2PMIFXHVXnWErkeQUpkP2BetxA4JsC35Lhr0lUN5QvUExEgoplyJwId3gSx9d.FUuLdy2znVRHFyNBrcktQ9Q8c.pEUzf0eU3iuWQFfp2rwIkPUevx5pi023cSKpo.QFcrkHog0baMI4djknPFgeRGrsBLDmDYHDjbOiXKT35Gu8sK1TIXmtEpS7muPiO8pTmb5OZD1d0j83.wChNsnbKke4A0ndGjt9krZzZhG7qjAyf7WvlFDRg10R1KjmzEfcLMeXaJJgbPUPpeG5nc1k9DNA_bjSvESeuYJxz.je.WkoyZ_c8qBPfIGgu_ggSMClSdfUTIZGnvvAIX6qsrnnuADaPsmE0YtESrYQ"
+		cookie = "session=9aad33be9fab8ac3f45a44b8a69583f8; cf_clearance=tCevVOubBdxttSFJaaMuXnrBBqXq6UQBx7WQJ2IS6XE-1792266100-1.2.1.1-XZYgwvKVXx4IL6Os2VwzVKdBjUOdm3L44Uurg072Y0eOq6hBZqkkmsJ2OaFMF2QODFOV6u_CG3xBFfZ0zvTK1KslQcajgayPkEajSbUF0oDeGUCpXhnaaWmFP9TzEVzIBUYzalPrRZdomlG00lZbUp2sQpxLkGo8LvpFUNRJUojFCACMzQ7QI_wwSCcZot5N2whzZ52tARdqhQ6PJfVJTyvOTW_zNAoGDkmBTLtCfNqjGdHp1g4ReXG.trLjWkciWWK7bUn58Q2q6BEmw3m.W14ziE1XDW_qJcJ8zm5ZVFxGhDHKmearkbIAArTz.a9GAnxPAhOZxxQ7h07qLf310JDeZ.O631iAg62oVE8I9R900o0jXAG8iwNdtZb0lFDj3v1WvyFfs4VfWp_aMdNC5HbNDd33_w1_iYmiKorSMIG6Q4CXei7.rPwcdDNpu4wPH0Mks7U20cUp_k2eKq5WKg"
 	}
 
 	fmt.Println("==================================================")
