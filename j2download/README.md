@@ -170,15 +170,20 @@ j2download/
 
 ## 🚀 Quick Start
 
-### 🌐 Mode 1: Pure HTTP Client (Zero Browser / Không Trình Duyệt)
+### 🌐 Pure HTTP Client (Auto-Generated Cookies & Zero Browser)
 
-**100% headless, lightweight standard library requests** (Go `net/http` & Node.js `https`). No Chromium, no Puppeteer, no CDP!
+**100% headless, lightweight standard library requests** (Go `net/http` & Node.js `https`). No Chromium, no Puppeteer, no CDP, and **no preset cookies required**!
+
+#### 🔑 Automatic Cookie Generation Mechanics:
+1. **Initial Handshake**: The client sends a clean `GET /vi` with standard browser navigation headers (`sec-fetch-dest: document`, `sec-fetch-mode: navigate`).
+2. **SSR Auto-Minting**: The `j2download.com` SSR engine automatically responds with `Set-Cookie: session=<hash>; Max-Age=599` and injects `window.__BOOTSTRAP__`.
+3. **Pure PoW Verification**: Because the session is fresh, the server grants access via `POST /api/auth/issue` based purely on the solved Proof-of-Work challenge—**Turnstile challenge is completely bypassed**!
 
 #### Go CLI:
 ```bash
 cd j2download
 
-# Runs out of the box with built-in active clearance session
+# Runs out of the box with 0 browser, 0 preset cookies, 0 external dependencies:
 go run main.go pow_solver.go "https://www.facebook.com/groups/1528487012172019/permalink/1685137529840299/"
 ```
 
@@ -186,19 +191,15 @@ go run main.go pow_solver.go "https://www.facebook.com/groups/1528487012172019/p
 ```bash
 cd j2download
 
-# Pure Node.js https client (zero npm dependencies)
+# Pure Node.js https client (zero npm dependencies, zero preset cookies):
 node client.js "https://www.facebook.com/groups/1528487012172019/permalink/1685137529840299/"
 ```
 
-> [!IMPORTANT]
-> **Cloudflare Clearance & User-Agent Pairing Rule**:
-> `cf_clearance` cookies cryptographically bind to the specific TLS/User-Agent of the issuer (`Chrome/155.0.0.0`). When making pure HTTP requests, the `User-Agent` and `sec-ch-ua` headers **MUST exactly match** the version bound to the clearance cookie. When matched, Cloudflare WAF bypasses Turnstile completely and delegates authorization directly to the Proof-of-Work challenge!
-
 ---
 
-### ⚡ Mode 2: Autonomous Turnstile & Session Refresher (`engine.js`)
+### ⚡ Autonomous Turnstile Engine (`engine.js`)
 
-When existing session cookies expire or when running in environments that need to mint new clearance sessions from scratch, `engine.js` automatically drives Chrome via native CDP WebSocket, auto-solves Cloudflare Turnstile in ~1 second, and issues fresh credentials:
+Optional fallback utility for environments requiring explicit interactive Turnstile token synthesis via Chrome CDP WebSocket:
 
 ```bash
 cd j2download

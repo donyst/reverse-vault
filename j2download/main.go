@@ -13,9 +13,8 @@ import (
 )
 
 const (
-	BASE_URL       = "https://j2download.com"
-	DEFAULT_UA     = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"
-	DEFAULT_COOKIE = "session=ae10e86b116b2b24d1d8e1e933ea6bfe; cf_clearance=tCevVOubBdxttSFJaaMuXnrBBqXq6UQBx7WQJ2IS6XE-1792266100-1.2.1.1-XZYgwvKVXx4IL6Os2VwzVKdBjUOdm3L44Uurg072Y0eOq6hBZqkkmsJ2OaFMF2QODFOV6u_CG3xBFfZ0zvTK1KslQcajgayPkEajSbUF0oDeGUCpXhnaaWmFP9TzEVzIBUYzalPrRZdomlG00lZbUp2sQpxLkGo8LvpFUNRJUojFCACMzQ7QI_wwSCcZot5N2whzZ52tARdqhQ6PJfVJTyvOTW_zNAoGDkmBTLtCfNqjGdHp1g4ReXG.trLjWkciWWK7bUn58Q2q6BEmw3m.W14ziE1XDW_qJcJ8zm5ZVFxGhDHKmearkbIAArTz.a9GAnxPAhOZxxQ7h07qLf310JDeZ.O631iAg62oVE8I9R900o0jXAG8iwNdtZb0lFDj3v1WvyFfs4VfWp_aMdNC5HbNDd33_w1_iYmiKorSMIG6Q4CXei7.rPwcdDNpu4wPH0Mks7U20cUp_k2eKq5WKg"
+	BASE_URL   = "https://j2download.com"
+	DEFAULT_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"
 )
 
 type IssueResponse struct {
@@ -44,9 +43,6 @@ type J2Client struct {
 }
 
 func NewJ2Client(cookie string) *J2Client {
-	if cookie == "" {
-		cookie = DEFAULT_COOKIE
-	}
 	return &J2Client{
 		HTTPClient: &http.Client{Timeout: 30 * time.Second},
 		Cookie:     cookie,
@@ -84,7 +80,9 @@ func (c *J2Client) FetchBootstrap() (*Bootstrap, error) {
 	req.Header.Set("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
 	req.Header.Set("accept-language", "vi,en-US;q=0.9,en;q=0.8")
 	req.Header.Set("user-agent", c.UserAgent)
-	req.Header.Set("cookie", c.Cookie)
+	if c.Cookie != "" {
+		req.Header.Set("cookie", c.Cookie)
+	}
 	req.Header.Set("sec-ch-ua", `"Chromium";v="155", "Not?A_Brand";v="24", "Google Chrome";v="155"`)
 	req.Header.Set("sec-ch-ua-mobile", "?0")
 	req.Header.Set("sec-ch-ua-platform", `"Windows"`)
@@ -229,9 +227,6 @@ func main() {
 	}
 
 	cookie := os.Getenv("J2_COOKIE")
-	if cookie == "" {
-		cookie = DEFAULT_COOKIE
-	}
 
 	fmt.Println("==================================================")
 	fmt.Println("  j2download.com PoW Solver & Link Resolver (Go)  ")
@@ -241,23 +236,26 @@ func main() {
 
 	client := NewJ2Client(cookie)
 
-	fmt.Println("[*] Fetching page bootstrap...")
+	fmt.Println("[*] Step 1: Connecting to j2download.com (Auto-generating session cookie)...")
 	b, err := client.FetchBootstrap()
 	if err != nil {
 		fmt.Printf("[-] Bootstrap error: %v\n", err)
 		os.Exit(1)
 	}
 
+	fmt.Printf("[+] Auto-generated session: %s\n", client.Cookie)
 	fmt.Printf("[+] Got bootstrap: nonce=%s, difficulty=%d, type=%s\n", b.Nonce, b.PowDifficulty, b.ChallengeType)
+
+	fmt.Println("[*] Step 2: Solving Proof-of-Work & requesting Bearer JWT...")
 	t0 := time.Now()
 	token, err := client.IssueAccessToken(b, "")
 	if err != nil {
 		fmt.Printf("[-] Issue access token error: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("[+] Solved PoW & Acquired Token in %v: %s...\n", time.Since(t0), token[:32])
+	fmt.Printf("[+] Solved PoW & Acquired JWT in %v: %s...\n", time.Since(t0), token[:32])
 
-	fmt.Println("[*] Resolving autolink...")
+	fmt.Println("[*] Step 3: Resolving media download links...")
 	res, err := client.ResolveAutolink(targetURL, token)
 	if err != nil {
 		fmt.Printf("[-] Autolink error: %v\n", err)

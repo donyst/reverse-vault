@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /**
  * ============================================================================
- * j2download.com — Pure HTTP Client & Media Link Resolver (Zero Browser)
+ * j2download.com — Pure HTTP Client with Auto-Generated Cookies (Zero Browser)
  * ============================================================================
- * Features:
- *   - 100% Pure HTTP (Node.js standard https, no browser/Chromium/Puppeteer)
- *   - High-performance SHA-256 Proof-of-Work solver (Classic & Alt double-round)
- *   - Automatic nonce & bootstrap recovery
- *   - Scoped JWT Token exchange & Autolink media resolution
+ * Key RE Insights:
+ *   - NO BROWSER REQUIRED (no Chrome, no CDP, no Puppeteer).
+ *   - NO PRESET COOKIES REQUIRED: Server automatically generates a fresh
+ *     session cookie on the initial GET /vi request if no cookie is supplied!
+ *   - Solves PoW (Classic & Alt double-round) in 1-5ms.
+ *   - Auto-handles bootstrap rotation & session refreshes.
  * ============================================================================
  */
 
@@ -15,7 +16,6 @@ const https = require('https');
 const { solvePow, parseBootstrap } = require('./pow_solver');
 
 const DEFAULT_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36";
-const DEFAULT_COOKIE = "session=9aad33be9fab8ac3f45a44b8a69583f8; cf_clearance=tCevVOubBdxttSFJaaMuXnrBBqXq6UQBx7WQJ2IS6XE-1792266100-1.2.1.1-XZYgwvKVXx4IL6Os2VwzVKdBjUOdm3L44Uurg072Y0eOq6hBZqkkmsJ2OaFMF2QODFOV6u_CG3xBFfZ0zvTK1KslQcajgayPkEajSbUF0oDeGUCpXhnaaWmFP9TzEVzIBUYzalPrRZdomlG00lZbUp2sQpxLkGo8LvpFUNRJUojFCACMzQ7QI_wwSCcZot5N2whzZ52tARdqhQ6PJfVJTyvOTW_zNAoGDkmBTLtCfNqjGdHp1g4ReXG.trLjWkciWWK7bUn58Q2q6BEmw3m.W14ziE1XDW_qJcJ8zm5ZVFxGhDHKmearkbIAArTz.a9GAnxPAhOZxxQ7h07qLf310JDeZ.O631iAg62oVE8I9R900o0jXAG8iwNdtZb0lFDj3v1WvyFfs4VfWp_aMdNC5HbNDd33_w1_iYmiKorSMIG6Q4CXei7.rPwcdDNpu4wPH0Mks7U20cUp_k2eKq5WKg";
 
 function sendRequest(url, options, postData) {
   return new Promise((resolve, reject) => {
@@ -32,37 +32,58 @@ function sendRequest(url, options, postData) {
 
 class J2DownloadClient {
   constructor(cookie = '') {
-    this.cookie = cookie || process.env.J2_COOKIE || DEFAULT_COOKIE;
+    this.cookie = cookie || process.env.J2_COOKIE || '';
     this.userAgent = DEFAULT_UA;
     this.accessToken = '';
   }
 
-  setCookie(cookie) {
-    this.cookie = cookie;
+  mergeCookies(setCookieHeaders) {
+    if (!setCookieHeaders || !Array.isArray(setCookieHeaders)) return;
+    for (const sc of setCookieHeaders) {
+      const parts = sc.split(';')[0].trim();
+      const [name, val] = parts.split('=');
+      if (name && val) {
+        if (this.cookie.includes(name + '=')) {
+          this.cookie = this.cookie.replace(new RegExp(name + '=[^;]+'), `${name}=${val}`);
+        } else {
+          this.cookie = this.cookie ? `${this.cookie}; ${parts}` : parts;
+        }
+      }
+    }
   }
 
   async fetchBootstrap() {
+    const headers = {
+      'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+      'accept-language': 'vi,en-US;q=0.9,en;q=0.8',
+      'user-agent': this.userAgent,
+      'sec-ch-ua': '"Chromium";v="155", "Not?A_Brand";v="24", "Google Chrome";v="155"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Windows"',
+      'sec-fetch-dest': 'document',
+      'sec-fetch-mode': 'navigate',
+      'sec-fetch-site': 'none',
+      'sec-fetch-user': '?1',
+      'upgrade-insecure-requests': '1'
+    };
+
+    if (this.cookie) {
+      headers['cookie'] = this.cookie;
+    }
+
     const res = await sendRequest('https://j2download.com/vi', {
       method: 'GET',
-      headers: {
-        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'accept-language': 'vi,en-US;q=0.9,en;q=0.8',
-        'user-agent': this.userAgent,
-        'cookie': this.cookie,
-        'sec-ch-ua': '"Chromium";v="155", "Not?A_Brand";v="24", "Google Chrome";v="155"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-        'sec-fetch-dest': 'document',
-        'sec-fetch-mode': 'navigate',
-        'sec-fetch-site': 'none',
-        'sec-fetch-user': '?1',
-        'upgrade-insecure-requests': '1'
-      }
+      headers
     });
+
+    // Auto-capture session cookie from Set-Cookie header
+    if (res.headers['set-cookie']) {
+      this.mergeCookies(res.headers['set-cookie']);
+    }
 
     const bootstrap = parseBootstrap(res.body);
     if (!bootstrap) {
-      throw new Error(`Không thể tìm thấy window.__BOOTSTRAP__. Kiểm tra lại cookie hoặc cf_clearance.`);
+      throw new Error(`Không thể tìm thấy window.__BOOTSTRAP__. HTTP status: ${res.status}`);
     }
     return bootstrap;
   }
@@ -91,6 +112,10 @@ class J2DownloadClient {
       headers
     }, '');
 
+    if (res.headers['set-cookie']) {
+      this.mergeCookies(res.headers['set-cookie']);
+    }
+
     let data;
     try {
       data = JSON.parse(res.body);
@@ -109,6 +134,10 @@ class J2DownloadClient {
         method: 'POST',
         headers
       }, '');
+
+      if (res.headers['set-cookie']) {
+        this.mergeCookies(res.headers['set-cookie']);
+      }
       data = JSON.parse(res.body);
     }
 
@@ -145,6 +174,10 @@ class J2DownloadClient {
       }
     }, payload);
 
+    if (res.headers['set-cookie']) {
+      this.mergeCookies(res.headers['set-cookie']);
+    }
+
     try {
       return JSON.parse(res.body);
     } catch {
@@ -157,7 +190,7 @@ class J2DownloadClient {
 if (require.main === module) {
   const targetUrl = process.argv[2] || "https://www.facebook.com/groups/1528487012172019/permalink/1685137529840299/";
   console.log('==================================================');
-  console.log('  J2Download Pure HTTP Solver & Link Extractor   ');
+  console.log('  J2Download Pure HTTP Solver (Auto-Gen Cookie)   ');
   console.log('==================================================');
   console.log('[*] Mode: Pure HTTP (ZERO BROWSER / KHÔNG TRÌNH DUYỆT)');
   console.log('[*] Target URL:', targetUrl);
@@ -165,16 +198,18 @@ if (require.main === module) {
   (async () => {
     const client = new J2DownloadClient();
     try {
-      console.log('[*] Fetching page bootstrap...');
+      console.log('[*] Step 1: Connecting to j2download.com (Auto-generating session cookie)...');
       const bootstrap = await client.fetchBootstrap();
+      console.log(`[+] Auto-generated session: ${client.cookie}`);
       console.log(`[+] Got bootstrap: nonce=${bootstrap.nonce}, difficulty=${bootstrap.powDifficulty}, type=${bootstrap.challengeType}`);
 
+      console.log('[*] Step 2: Solving Proof-of-Work & requesting Bearer JWT...');
       const t0 = performance.now();
       const token = await client.issueToken(bootstrap);
       const elapsed = (performance.now() - t0).toFixed(2);
       console.log(`[+] Solved PoW & Acquired JWT in ${elapsed}ms: ${token.substring(0, 36)}...`);
 
-      console.log('[*] Resolving autolink...');
+      console.log('[*] Step 3: Resolving media download links...');
       const result = await client.resolveAutolink(targetUrl, token);
       console.log('==================================================');
       console.log('               MEDIA RESOLVE SUCCESS              ');
