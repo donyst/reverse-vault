@@ -28,6 +28,7 @@
 | Module | Target | Core Technology | Highlights | Status |
 | :--- | :--- | :--- | :--- | :---: |
 | [`id_traodoisub`](./id_traodoisub/) | `id.traodoisub.com` | Go, Node.js, WebCrack, Custom VM | Complete reverse engineering of dynamic 9-opcode bytecode VM & `X-Ganly` proof signer (~480ms turnaround) | `Completed` |
+| [`j2download`](./j2download/) | `j2download.com` | Go, Node.js, SHA-256 Mining | 3-tier protection, Web Worker PoW miner (Classic & Alt double-round), JWT issue & autolink resolver | `Completed` |
 
 ---
 

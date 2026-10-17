@@ -1,0 +1,1 @@
+window.dataLayer=[];window.gtag=function(){dataLayer.push(arguments)};addEventListener('pointerdown',function f(){removeEventListener('pointerdown',f);var s=document.createElement('script');s.async=1;s.src='https://www.googletagmanager.com/gtag/js?id=G-XE0VG1MQXQ';document.head.appendChild(s);gtag('js',new Date);gtag('config','G-XE0VG1MQXQ')},{once:true,passive:true})

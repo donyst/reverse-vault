@@ -1,0 +1,1 @@
+const e={data:()=>({showImageModal:!1,previewImages:[],previewIndex:0}),methods:{openThumbnailModal(){const e=this.thumbnail?.(this.data?.thumbnail);e&&(this.previewImages=[e],this.previewIndex=0,this.showImageModal=!0)},closeThumbnailModal(){this.showImageModal=!1,this.previewImages=[],this.previewIndex=0}}};export{e as t};
